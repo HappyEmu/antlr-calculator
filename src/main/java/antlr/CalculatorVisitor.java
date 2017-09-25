@@ -19,31 +19,66 @@ public interface CalculatorVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitProg(CalculatorParser.ProgContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code LineExpr}
-	 * labeled alternative in {@link CalculatorParser#expr}.
+	 * Visit a parse tree produced by the {@code PrintStatement}
+	 * labeled alternative in {@link CalculatorParser#stat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitLineExpr(CalculatorParser.LineExprContext ctx);
+	T visitPrintStatement(CalculatorParser.PrintStatementContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code ParExpr}
-	 * labeled alternative in {@link CalculatorParser#expr}.
+	 * Visit a parse tree produced by the {@code AssignStatement}
+	 * labeled alternative in {@link CalculatorParser#stat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitParExpr(CalculatorParser.ParExprContext ctx);
+	T visitAssignStatement(CalculatorParser.AssignStatementContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code DotExpr}
-	 * labeled alternative in {@link CalculatorParser#expr}.
+	 * Visit a parse tree produced by the {@code EmptyStatement}
+	 * labeled alternative in {@link CalculatorParser#stat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDotExpr(CalculatorParser.DotExprContext ctx);
+	T visitEmptyStatement(CalculatorParser.EmptyStatementContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code IntLit}
+	 * Visit a parse tree produced by the {@code PowerExpr}
 	 * labeled alternative in {@link CalculatorParser#expr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitIntLit(CalculatorParser.IntLitContext ctx);
+	T visitPowerExpr(CalculatorParser.PowerExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code MultiplicativeExpr}
+	 * labeled alternative in {@link CalculatorParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMultiplicativeExpr(CalculatorParser.MultiplicativeExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code IdExpr}
+	 * labeled alternative in {@link CalculatorParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIdExpr(CalculatorParser.IdExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code AdditiveExpr}
+	 * labeled alternative in {@link CalculatorParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAdditiveExpr(CalculatorParser.AdditiveExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code IntLitExpr}
+	 * labeled alternative in {@link CalculatorParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIntLitExpr(CalculatorParser.IntLitExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ParensExpr}
+	 * labeled alternative in {@link CalculatorParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitParensExpr(CalculatorParser.ParensExprContext ctx);
 }

@@ -5,15 +5,17 @@ import antlr.CalculatorParser.*
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 
-class CalculatorVisitor : CalculatorBaseVisitor<Int>() {
+class CalculatorInterpreter : CalculatorBaseVisitor<Int>() {
 
-    override fun visitIntLit(ctx: IntLitContext): Int = ctx.text.toInt()
-    override fun visitParExpr(ctx: ParExprContext): Int = visit(ctx.expr())
-    override fun visitProg(ctx: ProgContext): Int = visit(ctx.expr().last())
+    private val memory = mutableMapOf<String, Int>()
 
-    override fun visitDotExpr(ctx: DotExprContext): Int {
-        val op1 = visit(ctx.op1)
-        val op2 = visit(ctx.op2)
+    override fun visitIntLitExpr(ctx: IntLitExprContext): Int = ctx.text.toInt()
+
+    override fun visitParensExpr(ctx: ParensExprContext): Int = visit(ctx.expr())
+
+    override fun visitMultiplicativeExpr(ctx: MultiplicativeExprContext): Int {
+        val op1 = visit(ctx.expr(0))
+        val op2 = visit(ctx.expr(1))
 
         return when (ctx.op.text) {
             "*" -> op1 * op2
@@ -22,9 +24,9 @@ class CalculatorVisitor : CalculatorBaseVisitor<Int>() {
         }
     }
 
-    override fun visitLineExpr(ctx: LineExprContext): Int {
-        val op1 = visit(ctx.op1)
-        val op2 = visit(ctx.op2)
+    override fun visitAdditiveExpr(ctx: AdditiveExprContext): Int {
+        val op1 = visit(ctx.expr(0))
+        val op2 = visit(ctx.expr(1))
 
         return when (ctx.op.text) {
             "+" -> op1 + op2
@@ -32,27 +34,48 @@ class CalculatorVisitor : CalculatorBaseVisitor<Int>() {
             else -> 0
         }
     }
+
+    override fun visitAssignStatement(ctx: AssignStatementContext): Int {
+        val id = ctx.ID().text
+        val value = visit(ctx.expr())
+
+        memory[id] = value
+
+        return value
+    }
+
+    override fun visitEmptyStatement(ctx: EmptyStatementContext): Int = 0
+
+    override fun visitPrintStatement(ctx: PrintStatementContext): Int {
+        println(visit(ctx.expr()))
+        return 0
+    }
+
+    override fun visitIdExpr(ctx: IdExprContext): Int {
+        val id = ctx.ID().text
+
+        return memory[id] ?: throw RuntimeException("Line ${ctx.ID().symbol.line}: Variable '$id' not assigned!")
+    }
+
+    override fun visitPowerExpr(ctx: PowerExprContext): Int {
+        return Math.pow(visit(ctx.expr(0)).toDouble(), visit(ctx.expr(1)).toDouble()).toInt()
+    }
 }
 
 fun main(args: Array<String>) {
 
-    while (true) {
-        print("> ")
-        val input = readLine()
+    val prog = """a = 2^2^3
+        b = 2*a + 3
+        c = a + b
+        c
+        """
 
-        if (input == "exit") break
-        if (input.isNullOrBlank()) continue
+    val stream = CharStreams.fromString(prog)
 
-        val stream = CharStreams.fromString(input + "\n")
+    val lexer = CalculatorLexer(stream)
+    val tokens = CommonTokenStream(lexer)
+    val parser = CalculatorParser(tokens)
 
-        val lexer = CalculatorLexer(stream)
-        val tokens = CommonTokenStream(lexer)
-
-        val parser = CalculatorParser(tokens)
-        val visitor = CalculatorVisitor()
-
-        val result = visitor.visit(parser.prog())
-
-        println(" = $result")
-    }
+    val visitor = CalculatorInterpreter()
+    visitor.visit(parser.prog())
 }

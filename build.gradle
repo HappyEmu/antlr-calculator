@@ -18,3 +18,7 @@ generateGrammarSource {
     arguments += ["-visitor", "-long-messages", "-no-listener"]
     outputDirectory = file("src/main/java/antlr/")
 }
+
+compileKotlin {
+    dependsOn 'generateGrammarSource'
+}

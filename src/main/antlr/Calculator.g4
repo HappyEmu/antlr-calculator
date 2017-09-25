@@ -4,11 +4,23 @@ grammar Calculator;
 package antlr;
 }
 
-prog:	(expr NEWLINE)* ;
-expr:	op1=expr op=('*'|'/') op2=expr #DotExpr
-    |	op1=expr op=('+'|'-') op2=expr #LineExpr
-    |	INT                 #IntLit
-    |	'(' expr ')'        #ParExpr
+prog: stat+
     ;
-NEWLINE : [\r\n]+ ;
-INT     : [0-9]+ ;
+
+stat:   expr NEWLINE                #PrintStatement
+    |   ID '=' expr NEWLINE         #AssignStatement
+    |   NEWLINE                     #EmptyStatement
+    ;
+
+expr:	<assoc=right> expr '^' expr #PowerExpr
+    |   expr op=('*'|'/') expr      #MultiplicativeExpr
+    |	expr op=('+'|'-') expr      #AdditiveExpr
+    |	INT                         #IntLitExpr
+    |   ID                          #IdExpr
+    |	'(' expr ')'                #ParensExpr
+    ;
+
+ID  : [a-zA-Z]+ ;
+INT : [0-9]+ ;
+NEWLINE : '\r'? '\n' ;
+WS  : [ \t]+ -> skip ;
