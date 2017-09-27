@@ -6,24 +6,19 @@ import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import java.io.File
 
-class JasmineCompiler : CalculatorBaseVisitor<Unit>() {
-    val builder = File("Calculator.j").printWriter()
-    val variables = mutableMapOf<String, Int>()
+class JasminCompiler : CalculatorBaseVisitor<Unit>() {
+
+    private val builder = File("Calculator.j").printWriter()
+    private val variables = mutableMapOf<String, Int>()
 
     override fun visitProg(ctx: CalculatorParser.ProgContext) {
-        with(builder) {
-            appendln(".bytecode 49.0")
+        with (builder) {
+            appendln(".bytecode 50.0")
             appendln(".class public Calculator")
             appendln(".super java/lang/Object")
-
-            /*appendln(".method public <init>()V")
-            appendln("  aload_0")
-            appendln("  invokenonvirtual java/lang/Object/<init>()V")
-            appendln("  return")
-            appendln(".end method")*/
         }
 
-        with(builder) {
+        with (builder) {
             appendln(".method public static main([Ljava/lang/String;)V")
             appendln("  .limit stack 10")
             appendln("  .limit locals 20")
@@ -31,7 +26,7 @@ class JasmineCompiler : CalculatorBaseVisitor<Unit>() {
 
         visitChildren(ctx)
 
-        with(builder) {
+        with (builder) {
             appendln("  return")
             appendln(".end method")
         }
@@ -49,7 +44,7 @@ class JasmineCompiler : CalculatorBaseVisitor<Unit>() {
         // Push value of expression onto stack
         visit(ctx.expr())
 
-        with(builder) {
+        with (builder) {
             appendln("  istore ${variables[variable]}")
         }
     }
@@ -64,7 +59,7 @@ class JasmineCompiler : CalculatorBaseVisitor<Unit>() {
 
     override fun visitIntLitExpr(ctx: IntLitExprContext) {
         val value = ctx.INT().text.toInt()
-        with(builder) {
+        with (builder) {
             appendln("  ldc $value")
         }
     }
@@ -73,7 +68,7 @@ class JasmineCompiler : CalculatorBaseVisitor<Unit>() {
         val variable = ctx.ID().text
         val idx = variables[variable] ?: throw RuntimeException("Variable $variable not found!")
 
-        with(builder) {
+        with (builder) {
             appendln("  iload $idx")
         }
     }
@@ -117,7 +112,8 @@ class JasmineCompiler : CalculatorBaseVisitor<Unit>() {
 }
 
 fun main(args: Array<String>) {
-    val prog = """a = 2^2^3
+    val prog = """
+        a = 2^2^3
         b = 2*(a + 3)
         c = a + b
         c
@@ -129,6 +125,6 @@ fun main(args: Array<String>) {
     val tokens = CommonTokenStream(lexer)
     val parser = CalculatorParser(tokens)
 
-    val compiler = JasmineCompiler()
+    val compiler = JasminCompiler()
     compiler.visit(parser.prog())
 }

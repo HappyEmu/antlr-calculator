@@ -64,7 +64,8 @@ class CalculatorInterpreter : CalculatorBaseVisitor<Int>() {
 
 fun main(args: Array<String>) {
 
-    val prog = """a = 2^2^3
+    val prog = """
+        a = 2^2^3
         b = 2*(a + 3)
         c = a + b
         c
